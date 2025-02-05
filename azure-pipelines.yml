@@ -4,7 +4,7 @@
 # https://docs.microsoft.com/azure/devops/pipelines/languages/python
 
 trigger:
-- main
+  - main
  
 pool:
   vmImage: ubuntu-latest
@@ -25,40 +25,27 @@ steps:
     displayName: 'Use Python $(python.version)'
  
   - script: |
-python -m pip install --upgrade pip 
-
-pip install -r requirements.txt 
-
-displayName: 'Install dependencies'  
-
+      python -m pip install --upgrade pip
+      pip install -r requirements.txt
+    displayName: 'Install dependencies'
  
- - task: ArchiveFiles@2
+  - task: ArchiveFiles@2
     displayName: 'Archive files'
     inputs:
-      rootFolderOrFile: $(System.DefaultWorkingDirectory)
+      rootFolderOrFile: '$(System.DefaultWorkingDirectory)'
       includeRootFolder: false
       archiveType: zip
-      archiveFile: $(Build.ArtifactStagingDirectory)/$(Build.BuildId)-$(python.version).zip 
-      replaceExistingArchive: true 
-
+      archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId)-$(python.version).zip'
+      replaceExistingArchive: true
  
-
-  - task: PublishBuildArtifacts@1 
-
-    inputs: 
-
-      PathtoPublish: '$(Build.ArtifactStagingDirectory)' 
-
-      ArtifactName: 'drop' 
-
-      publishLocation: 'Container' 
-
+  - task: PublishBuildArtifacts@1
+    displayName: 'Publish artifacts'
+    inputs:
+      PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+      ArtifactName: 'drop'
+      publishLocation: 'Container'
  
-
-  - script: | 
-
-      pip install pytest pytest-azurepipelines 
-
-      pytest 
-
-      displayName: 'pytest'   
+  - script: |
+      pip install pytest pytest-azurepipelines
+      pytest
+    displayName: 'Run pytest'
